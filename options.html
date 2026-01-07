@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Chess Bot Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>♟️ Smart Chess Bot Settings</h1>
+    </header>
+
+    <!-- Main Settings -->
+    <div class="card">
+      <div class="card-body">
+        <h2 class="card-title">Main Settings</h2>
+        <button class="btn" id="reset-settings">Reset Settings</button>
+        <div class="space"></div>
+        <button class="btn" id="night-mode">Enable Night Mode</button>
+        <div class="space"></div>
+        <button class="btn" id="tutorials">Tutorials / Support</button>
+      </div>
+    </div>
+
+    <!-- Engine Selection -->
+    <div class="card">
+      <div class="card-body">
+        <h2 class="card-title">Engine</h2>
+        <div class="form-group">
+          <select class="form-control" id="select-engine">
+            <option value="0">Lozza</option>
+            <option value="1">Stockfish 5</option>
+            <option value="2">Stockfish 2018</option>
+            <option value="3">Node Server Engines</option>
+            <option value="4">Lichess Cloud (Lichess.org only)</option>
+            <option value="5">Remote WebSocket Engine</option>
+          </select>
+        </div>
+
+        <label class="checkbox-container">Use book moves
+          <input type="checkbox" id="use-book-moves">
+          <span class="checkmark"></span>
+        </label>
+
+        <div id="reload-engine-div">
+          <label class="checkbox-container">Enable Engine Reload
+            <input type="checkbox" id="reload-engine">
+            <span class="checkmark"></span>
+          </label>
+
+          <div id="reload-count-div" style="display: none;">
+            <label for="reload-count">Reload Engine every</label>
+            <input type="number" id="reload-count" value="10" min="1">
+            <label>moves</label>
+          </div>
+        </div>
+
+        <div id="node-engine-div" style="display: none;">
+          <div class="form-group">
+            <label for="engine-url">Engine URL:</label>
+            <input type="text" class="form-control" id="engine-url" value="http://localhost:5000">
+          </div>
+          <div class="space"></div>
+          <div class="form-group">
+            <label for="engine-name">Engine Name:</label>
+            <input type="text" class="form-control" id="engine-name" value="stockfish-15">
+          </div>
+        </div>
+
+        <div id="lichess-cloud-info" style="display: none;">
+          <p class="info-text">Lichess Cloud uses Lichess.org's cloud analysis API. Analysis depth depends on the position's popularity in the database.</p>
+        </div>
+
+        <div id="websocket-engine-div" style="display: none;">
+          <div class="form-group">
+            <label for="ws-base-url">WebSocket Base URL:</label>
+            <input type="text" class="form-control" id="ws-base-url" value="wss://ProtonnDev-engine.hf.space">
+          </div>
+          <div class="space"></div>
+          <div class="form-group">
+            <label for="ws-engine-type">Engine Type:</label>
+            <select class="form-control" id="ws-engine-type">
+              <option value="stockfish">Stockfish</option>
+              <option value="maia">Maia Bot (Human-like)</option>
+              <option value="rodent3">Rodent III (Personalities)</option>
+              <option value="patricia">Patricia (Aggressive)</option>
+            </select>
+          </div>
+          <div class="space"></div>
+          <div id="ws-version-config">
+            <!-- Dynamic configuration based on engine type -->
+          </div>
+          <div class="space"></div>
+          <p class="info-text" id="ws-engine-info"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Engine Strength -->
+    <div class="card">
+      <div class="card-body">
+        <h2 class="card-title">Engine Strength</h2>
+
+        <div class="form-group">
+          <label for="select-engine-mode">Engine Mode:</label>
+          <select class="form-control" id="select-engine-mode">
+            <option value="0">Depth</option>
+            <option value="1">Move time</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Engine Power:</label>
+          <div id="depth-control">
+            <input type="range" class="form-range" min="1" max="20" step="1" value="10" id="depth-range">
+            <input type="number" class="form-number" min="1" max="20" value="10" id="depth-range-number">
+          </div>
+          <div id="movetime-control" style="display: none;">
+            <input type="range" class="form-range" min="50" max="2000" step="50" value="666" id="movetime-range">
+            <input type="number" class="form-number" min="50" max="2000" value="666" id="movetime-range-number">
+          </div>
+        </div>
+
+        <div class="card-footer" id="elo-info">
+          <ul>
+            <li id="elo-value">Elo: 1750</li>
+            <li id="elo-rank">Rank: Advanced</li>
+            <li id="elo-power">Depth: 10</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bullet Mode -->
+    <div class="card">
+      <div class="card-body">
+        <h2 class="card-title">Bullet Mode (Fast Games)</h2>
+
+        <label class="checkbox-container">Ultra-fast mode (very low depth)
+          <input type="checkbox" id="bullet-mode">
+          <span class="checkmark"></span>
+        </label>
+
+        <div id="bullet-settings" style="display: none;">
+          <div class="form-group">
+            <label for="bullet-movetime">Bullet movetime (ms):</label>
+            <input type="number" class="form-control" id="bullet-movetime" min="50" max="200" value="100">
+          </div>
+          <div class="space"></div>
+          <div class="form-group">
+            <label for="bullet-depth">Max depth limit:</label>
+            <input type="number" class="form-control" id="bullet-depth" min="1" max="10" value="4">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visual Settings -->
+    <div class="card">
+      <div class="card-body">
+        <h2 class="card-title">Visual</h2>
+
+        <div class="alert">
+          <span>⚠️</span> Warning: Displaying moves are detectable, use with caution!
+        </div>
+
+        <div id="max-moves-div">
+          <div class="form-group">
+            <label for="max-moves">Max Best Moves:</label>
+            <input type="number" class="form-control" min="1" max="10" id="max-moves" value="5">
+          </div>
+
+          <div class="card nested-card">
+            <div class="card-body">
+              <h3 class="card-title">Best Moves Colors</h3>
+              <div id="best-moves-colors">
+                <!-- Color inputs will be dynamically generated -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <label class="checkbox-container">Display moves on chessboard
+          <input type="checkbox" id="display-moves-on-site">
+          <span class="checkmark"></span>
+        </label>
+
+        <label class="checkbox-container">Display Opponent best moves
+          <input type="checkbox" id="show-opposite-moves">
+          <span class="checkmark"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Other Settings -->
+    <div class="card">
+      <div class="card-body">
+        <h2 class="card-title">Other</h2>
+
+        <label class="checkbox-container">Enable Userscript Log
+          <input type="checkbox" id="enable-user-log">
+          <span class="checkmark"></span>
+        </label>
+
+        <label class="checkbox-container">Enable Engine Log
+          <input type="checkbox" id="enable-engine-log">
+          <span class="checkmark"></span>
+        </label>
+      </div>
+    </div>
+
+    <footer>
+      <a href="https://github.com/reductionfear/smartchessbot" target="_blank">GitHub</a>
+    </footer>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

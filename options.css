@@ -1,0 +1,371 @@
+/* Options page styles for Smart Chess Bot */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background-color: #fff;
+  color: #333;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+body.night {
+  background-color: #312e2b;
+  color: #fff;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+header h1 {
+  font-size: 24px;
+  color: #333;
+  transition: color 0.2s;
+}
+
+body.night header h1 {
+  color: #fff;
+}
+
+.card {
+  border: 3px solid rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  background-color: #fff;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+body.night .card {
+  background-color: #545454;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.nested-card {
+  margin-top: 12px;
+  border-width: 2px;
+}
+
+.card-body {
+  padding: 16px;
+}
+
+.card-title {
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: #333;
+  transition: color 0.2s;
+}
+
+body.night .card-title {
+  color: #fff;
+}
+
+h3.card-title {
+  font-size: 15px;
+}
+
+.card-footer {
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 8px 8px;
+  transition: background-color 0.2s;
+}
+
+body.night .card-footer {
+  background-color: #3d3d3d;
+}
+
+.card-footer ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.card-footer li {
+  margin-bottom: 4px;
+}
+
+.space {
+  height: 10px;
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+  font-size: 14px;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+body.night .form-control {
+  background-color: #3d3d3d;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #2196F3;
+}
+
+.form-range {
+  width: calc(100% - 80px);
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+.form-number {
+  width: 70px;
+  padding: 6px;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+  font-size: 14px;
+  vertical-align: middle;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+body.night .form-number {
+  background-color: #3d3d3d;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn {
+  width: 100%;
+  padding: 10px 16px;
+  border: 3px solid #bbb;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn:hover {
+  background-color: #0d6efd;
+  color: #fff;
+  border-color: #0d6efd;
+}
+
+.btn:active {
+  background-color: #0c5acd;
+  border-color: #0c5acd;
+}
+
+body.night .btn {
+  background-color: #545454;
+  color: #fff;
+  border-color: #666;
+}
+
+body.night .btn:hover {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+/* Checkbox container */
+.checkbox-container {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 15px;
+  user-select: none;
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+  outline: 3px solid #bbb;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+body.night .checkmark {
+  background-color: #3d3d3d;
+  outline: none;
+  border: 2px solid #666;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+body.night .checkbox-container:hover input ~ .checkmark {
+  background-color: #555;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: #2196F3;
+  outline-color: #2196F3;
+}
+
+body.night .checkbox-container input:checked ~ .checkmark {
+  border-color: #2196F3;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.checkbox-container .checkmark:after {
+  width: 40%;
+  height: 70%;
+  margin-left: 1px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+
+/* Alert box */
+.alert {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  background-color: #f44336;
+  color: white;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.info-text {
+  color: #666;
+  font-style: italic;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+body.night .info-text {
+  color: #aaa;
+}
+
+/* Color input styling */
+.color-input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.color-input-group label {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.color-input-group input[type="color"] {
+  width: 50px;
+  height: 30px;
+  padding: 0;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+body.night .color-input-group input[type="color"] {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.night footer {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+footer a {
+  color: #666;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+footer a:hover {
+  color: #0d6efd;
+}
+
+body.night footer a {
+  color: #aaa;
+}
+
+body.night footer a:hover {
+  color: #4da6ff;
+}
+
+/* Number input for reload count */
+#reload-count {
+  width: 60px;
+  padding: 4px 8px;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  margin: 0 8px;
+  text-align: center;
+}
+
+body.night #reload-count {
+  background-color: #3d3d3d;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+#reload-count-div {
+  margin-top: 8px;
+  margin-left: 35px;
+}
+
+#reload-count-div label {
+  display: inline;
+}

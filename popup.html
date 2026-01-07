@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <h2>♟️ Smart Chess Bot</h2>
+    <div class="status" id="status">Ready</div>
+    
+    <div class="section">
+      <h3>Quick Settings</h3>
+      <label>
+        <input type="checkbox" id="bullet-mode"> Bullet Mode (Fast Games)
+      </label>
+      <label>
+        <input type="checkbox" id="display-moves"> Display Moves on Board
+      </label>
+    </div>
+    
+    <div class="section">
+      <h3>Engine</h3>
+      <select id="engine-select">
+        <option value="0">Lozza</option>
+        <option value="1">Stockfish 5</option>
+        <option value="2">Stockfish 2018</option>
+        <option value="3">Node Server</option>
+        <option value="4">Lichess Cloud (Lichess only)</option>
+        <option value="5">Remote WebSocket</option>
+      </select>
+    </div>
+    
+    <div class="section" id="node-settings" style="display:none;">
+      <label>Server URL:
+        <input type="text" id="node-url" value="http://localhost:5000">
+      </label>
+      <label>Engine Name:
+        <input type="text" id="node-engine" value="stockfish.exe">
+      </label>
+    </div>
+    
+    <div class="section" id="websocket-settings" style="display:none;">
+      <label>Engine Type:
+        <select id="ws-engine-type">
+          <option value="stockfish">Stockfish</option>
+          <option value="maia">Maia Bot</option>
+          <option value="rodent3">Rodent III</option>
+          <option value="patricia">Patricia</option>
+        </select>
+      </label>
+      <div id="ws-version-container">
+        <!-- Dynamic version/elo/personality selector will be shown here -->
+      </div>
+    </div>
+    
+    <button id="open-gui">Open Full Settings</button>
+    <button id="get-best-move">Get Best Move</button>
+    
+    <div class="footer">
+      <a href="https://github.com/reductionfear/smartchessbot" target="_blank">GitHub</a>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

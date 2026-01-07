@@ -1,0 +1,47 @@
+{
+  "manifest_version": 3,
+  "name": "Smart Chess Bot",
+  "version": "1.0.0",
+  "description": "Chess analysis system for Chess.com and Lichess.org",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "options_page": "options.html",
+  "host_permissions": [
+    "https://www.chess.com/*",
+    "https://lichess.org/*",
+    "http://localhost:*/*",
+    "wss://ProtonnDev-engine.hf.space/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://www.chess.com/*", "https://lichess.org/*"],
+      "js": ["storage.js", "content.js"],
+      "css": ["styles/chessboard.css"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["content/*", "styles/*", "icons/*"],
+      "matches": ["https://www.chess.com/*", "https://lichess.org/*"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
