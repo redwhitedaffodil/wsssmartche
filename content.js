@@ -375,7 +375,10 @@ function moveResult(from, to, power, clear = true, depth = null) {
     // Auto-move if enabled and it's player's turn
     if (auto_move_enabled && isPlayerTurn) {
         const move = from + to;
-        const delay = Math.floor(Math.random() * (auto_move_delay_max - auto_move_delay_min)) + auto_move_delay_min;
+        // Ensure valid delay range
+        const minDelay = Math.min(auto_move_delay_min, auto_move_delay_max);
+        const maxDelay = Math.max(auto_move_delay_min, auto_move_delay_max);
+        const delay = Math.floor(Math.random() * (maxDelay - minDelay)) + minDelay;
         Interface.log(`Auto-move scheduled in ${delay}ms`);
         setTimeout(() => playMove(move), delay);
     }
@@ -454,7 +457,7 @@ function playMove(uciMove) {
             setTimeout(() => {
                 const promoMap = { 'q': 'queen', 'r': 'rook', 'b': 'bishop', 'n': 'knight' };
                 const promoPiece = uciMove[4];
-                if (promoMap[promoPiece]) {
+                if (promoPiece && promoMap[promoPiece]) {
                     const promoButton = document.querySelector(`[data-piece="${promoMap[promoPiece]}"]`);
                     if (promoButton) {
                         promoButton.click();
@@ -463,6 +466,7 @@ function playMove(uciMove) {
                     }
                 } else {
                     Interface.log(`Warning: Invalid promotion piece: ${promoPiece}`);
+                }
                 }
             }, 100);
         }
