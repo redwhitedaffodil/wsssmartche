@@ -346,7 +346,10 @@ function moveResult(from, to, power, clear = true, depth = null) {
 
 
     for (let a = 0; a < possible_moves.length; a++) {
-        const altColor = hexToRgb(bestMoveColors[a + 1]); // Fixed: use a+1 since bestMoveColors[0] is for main move
+        // Fixed: use a+1 since bestMoveColors[0] is for main move
+        // Ensure we don't exceed the color array bounds
+        const colorIndex = Math.min(a + 1, bestMoveColors.length - 1);
+        const altColor = hexToRgb(bestMoveColors[colorIndex]);
         Interface.boardUtils.markMove(possible_moves[a].slice(0, 2), possible_moves[a].slice(2, 4), altColor);
     }
 
@@ -441,14 +444,26 @@ function playMove(uciMove) {
     
     Interface.log('Auto-playing move: ' + uciMove);
     
+    // Simulate drag and drop with pointer events
+    // 50ms delay between pointerdown and pointerup mimics natural mouse movement
     board.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, view: window, clientX: fromPos.x, clientY: fromPos.y, pointerId: 1, pointerType: 'mouse' }));
     setTimeout(() => {
         board.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true, view: window, clientX: toPos.x, clientY: toPos.y, pointerId: 1, pointerType: 'mouse' }));
         if (uciMove.length > 4) {
+            // 100ms delay for promotion UI to appear
             setTimeout(() => {
                 const promoMap = { 'q': 'queen', 'r': 'rook', 'b': 'bishop', 'n': 'knight' };
-                const promoButton = document.querySelector(`[data-piece="${promoMap[uciMove[4]]}"]`);
-                if (promoButton) promoButton.click();
+                const promoPiece = uciMove[4];
+                if (promoMap[promoPiece]) {
+                    const promoButton = document.querySelector(`[data-piece="${promoMap[promoPiece]}"]`);
+                    if (promoButton) {
+                        promoButton.click();
+                    } else {
+                        Interface.log(`Warning: Promotion button not found for ${promoPiece}`);
+                    }
+                } else {
+                    Interface.log(`Warning: Invalid promotion piece: ${promoPiece}`);
+                }
             }, 100);
         }
     }, 50);
@@ -1607,6 +1622,7 @@ async function getBestMoves(request) {
                 let move_time = infoObj.time || effectiveMovetime;
 
                 // Fix: Parse PV moves properly - engine output contains sequential moves
+                // We skip the first move (best move at index 0) and extract alternative moves (1 to max_best_moves)
                 if (e.data.includes(' pv ')) {
                     const pvIndex = e.data.lastIndexOf(' pv ');
                     const pvString = e.data.slice(pvIndex + 4);
