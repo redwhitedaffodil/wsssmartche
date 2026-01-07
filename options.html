@@ -156,6 +156,33 @@
       </div>
     </div>
 
+    <!-- Auto-Move Settings -->
+    <div class="card">
+      <div class="card-body">
+        <h2 class="card-title">Auto-Move</h2>
+        <div class="alert">
+          <span>⚠️</span> Warning: Auto-move is highly detectable! Use at your own risk!
+        </div>
+        <div class="form-group checkbox-group">
+          <label class="checkbox-container">
+            <input type="checkbox" id="auto-move-enabled">
+            <span class="checkmark"></span>
+            Enable Auto-Move
+          </label>
+        </div>
+        <div id="auto-move-settings" style="display: none;">
+          <div class="form-group">
+            <label for="auto-move-delay-min">Min Delay (ms):</label>
+            <input type="number" class="form-control" id="auto-move-delay-min" min="100" max="10000" value="500">
+          </div>
+          <div class="form-group">
+            <label for="auto-move-delay-max">Max Delay (ms):</label>
+            <input type="number" class="form-control" id="auto-move-delay-max" min="100" max="10000" value="2000">
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Visual Settings -->
     <div class="card">
       <div class="card-body">

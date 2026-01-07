@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const settings = await chrome.storage.local.get([
     'bullet_mode',
     'displayMovesOnSite',
+    'auto_move_enabled',
     'engineIndex',
     'node_engine_url',
     'node_engine_name',
@@ -16,6 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Set checkbox states
   document.getElementById('bullet-mode').checked = settings.bullet_mode || false;
   document.getElementById('display-moves').checked = settings.displayMovesOnSite || false;
+  document.getElementById('auto-move').checked = settings.auto_move_enabled || false;
   
   // Set engine selection
   const engineSelect = document.getElementById('engine-select');
@@ -42,6 +44,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('display-moves').addEventListener('change', async (e) => {
     await chrome.storage.local.set({ displayMovesOnSite: e.target.checked });
     sendMessageToContentScript({ action: 'updateSetting', key: 'displayMovesOnSite', value: e.target.checked });
+  });
+  
+  document.getElementById('auto-move').addEventListener('change', async (e) => {
+    await chrome.storage.local.set({ auto_move_enabled: e.target.checked });
+    sendMessageToContentScript({ action: 'updateSetting', key: 'auto_move_enabled', value: e.target.checked });
   });
   
   engineSelect.addEventListener('change', async (e) => {

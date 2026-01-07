@@ -62,6 +62,11 @@ var bullet_mode = false;
 var bullet_depth = 4;
 var bullet_movetime = 100;
 
+// Auto-move settings
+var auto_move_enabled = false;
+var auto_move_delay_min = 500;
+var auto_move_delay_max = 2000;
+
 var lastBestMoveID = 0;
 
 // WebSocket engine state
@@ -94,7 +99,10 @@ const dbValues = {
     bestMoveColors: "bestMoveColors",
     bullet_mode: "bullet_mode",
     bullet_depth: "bullet_depth",
-    bullet_movetime: "bullet_movetime"
+    bullet_movetime: "bullet_movetime",
+    auto_move_enabled: "auto_move_enabled",
+    auto_move_delay_min: "auto_move_delay_min",
+    auto_move_delay_max: "auto_move_delay_max"
 };
 
 
@@ -232,6 +240,15 @@ function updateSettingFromPopup(key, value) {
                 connectWebSocketEngine();
             }
             break;
+        case 'auto_move_enabled':
+            auto_move_enabled = value;
+            break;
+        case 'auto_move_delay_min':
+            auto_move_delay_min = value;
+            break;
+        case 'auto_move_delay_max':
+            auto_move_delay_max = value;
+            break;
     }
 }
 
@@ -329,8 +346,8 @@ function moveResult(from, to, power, clear = true, depth = null) {
 
 
     for (let a = 0; a < possible_moves.length; a++) {
-        const color = hexToRgb(bestMoveColors[a]);
-        Interface.boardUtils.markMove(possible_moves[a].slice(0, 2), possible_moves[a].slice(2, 4), color);
+        const altColor = hexToRgb(bestMoveColors[a + 1]); // Fixed: use a+1 since bestMoveColors[0] is for main move
+        Interface.boardUtils.markMove(possible_moves[a].slice(0, 2), possible_moves[a].slice(2, 4), altColor);
     }
 
     // Send analysis result to popup
@@ -351,6 +368,14 @@ function moveResult(from, to, power, clear = true, depth = null) {
     }
 
     Interface.stopBestMoveProcessingAnimation();
+    
+    // Auto-move if enabled and it's player's turn
+    if (auto_move_enabled && isPlayerTurn) {
+        const move = from + to;
+        const delay = Math.floor(Math.random() * (auto_move_delay_max - auto_move_delay_min)) + auto_move_delay_min;
+        Interface.log(`Auto-move scheduled in ${delay}ms`);
+        setTimeout(() => playMove(move), delay);
+    }
 }
 
 function hexToRgb(hex) {
@@ -361,6 +386,72 @@ function hexToRgb(hex) {
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
     return [r, g, b, 0.5];
+}
+
+// Auto-move helper functions
+function coordToYX(coord) {
+    const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    return [letters.indexOf(coord[0]) + 1, Number(coord[1])];
+}
+
+function calculateDOMSquarePosition(square) {
+    if (CURRENT_SITE == CHESS_COM) {
+        const board = document.querySelector('wc-chess-board') || chessBoardElem;
+        if (!board) return null;
+        const rect = board.getBoundingClientRect();
+        const squareWidth = rect.width / 8;
+        const correction = squareWidth / 2;
+        const coords = coordToYX(square);
+        const isFlipped = document.querySelector('.board.flipped') !== null;
+        if (!isFlipped) {
+            return { x: rect.left + squareWidth * coords[0] - correction, y: rect.top + rect.width - squareWidth * coords[1] + correction };
+        } else {
+            return { x: rect.left + rect.width - squareWidth * coords[0] + correction, y: rect.top + squareWidth * coords[1] - correction };
+        }
+    } else if (CURRENT_SITE == LICHESS_ORG) {
+        const cgContainer = chessBoardElem?.querySelector('cg-container');
+        if (!cgContainer) return null;
+        const rect = cgContainer.getBoundingClientRect();
+        const squareWidth = rect.width / 8;
+        const correction = squareWidth / 2;
+        const coords = coordToYX(square);
+        const isFlipped = isLichessBoardFlipped();
+        if (!isFlipped) {
+            return { x: rect.left + squareWidth * (coords[0] - 1) + correction, y: rect.top + squareWidth * (8 - coords[1]) + correction };
+        } else {
+            return { x: rect.left + squareWidth * (8 - coords[0]) + correction, y: rect.top + squareWidth * (coords[1] - 1) + correction };
+        }
+    }
+    return null;
+}
+
+function playMove(uciMove) {
+    if (!uciMove || uciMove.length < 4) {
+        Interface.log('Invalid move: ' + uciMove);
+        return;
+    }
+    const fromPos = calculateDOMSquarePosition(uciMove.slice(0, 2));
+    const toPos = calculateDOMSquarePosition(uciMove.slice(2, 4));
+    if (!fromPos || !toPos) {
+        Interface.log('Could not calculate square positions');
+        return;
+    }
+    const board = CURRENT_SITE == CHESS_COM ? (document.querySelector('wc-chess-board') || chessBoardElem) : chessBoardElem;
+    if (!board) return;
+    
+    Interface.log('Auto-playing move: ' + uciMove);
+    
+    board.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, view: window, clientX: fromPos.x, clientY: fromPos.y, pointerId: 1, pointerType: 'mouse' }));
+    setTimeout(() => {
+        board.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true, view: window, clientX: toPos.x, clientY: toPos.y, pointerId: 1, pointerType: 'mouse' }));
+        if (uciMove.length > 4) {
+            setTimeout(() => {
+                const promoMap = { 'q': 'queen', 'r': 'rook', 'b': 'bishop', 'n': 'knight' };
+                const promoButton = document.querySelector(`[data-piece="${promoMap[uciMove[4]]}"]`);
+                if (promoButton) promoButton.click();
+            }, 100);
+        }
+    }, 50);
 }
 
 
@@ -1515,11 +1606,15 @@ async function getBestMoves(request) {
                 achievedDepth = infoObj.depth || effectiveDepth;
                 let move_time = infoObj.time || effectiveMovetime;
 
-                possible_moves = e.data.slice(e.data.lastIndexOf("pv"), e.data.length)
-                    .split(" ")
-                    .slice(1)
-                    .filter((_, index) => index % 2 === 0)
-                    .slice(1, max_best_moves);
+                // Fix: Parse PV moves properly - engine output contains sequential moves
+                if (e.data.includes(' pv ')) {
+                    const pvIndex = e.data.lastIndexOf(' pv ');
+                    const pvString = e.data.slice(pvIndex + 4);
+                    const allMoves = pvString.split(' ').filter(m => m.length >= 4 && /^[a-h][1-8][a-h][1-8]/.test(m));
+                    possible_moves = allMoves.slice(1, max_best_moves + 1);
+                } else {
+                    possible_moves = [];
+                }
 
 
                 if (bullet_mode) {
@@ -1923,6 +2018,9 @@ async function initializeDatabase(callback) {
         await Storage.set(dbValues.bullet_mode, bullet_mode);
         await Storage.set(dbValues.bullet_depth, bullet_depth);
         await Storage.set(dbValues.bullet_movetime, bullet_movetime);
+        await Storage.set(dbValues.auto_move_enabled, auto_move_enabled);
+        await Storage.set(dbValues.auto_move_delay_min, auto_move_delay_min);
+        await Storage.set(dbValues.auto_move_delay_max, auto_move_delay_max);
 
         // Initialize colors
         bestMoveColors = Array.from({ length: max_best_moves }, () => getRandomColor());
@@ -1964,6 +2062,14 @@ async function initializeDatabase(callback) {
         bullet_mode = storedBulletMode !== undefined ? storedBulletMode : bullet_mode;
         bullet_depth = storedBulletDepth !== undefined ? storedBulletDepth : bullet_depth;
         bullet_movetime = storedBulletMovetime !== undefined ? storedBulletMovetime : bullet_movetime;
+        
+        const storedAutoMoveEnabled = await Storage.get(dbValues.auto_move_enabled);
+        const storedAutoMoveDelayMin = await Storage.get(dbValues.auto_move_delay_min);
+        const storedAutoMoveDelayMax = await Storage.get(dbValues.auto_move_delay_max);
+        
+        auto_move_enabled = storedAutoMoveEnabled !== undefined ? storedAutoMoveEnabled : auto_move_enabled;
+        auto_move_delay_min = storedAutoMoveDelayMin !== undefined ? storedAutoMoveDelayMin : auto_move_delay_min;
+        auto_move_delay_max = storedAutoMoveDelayMax !== undefined ? storedAutoMoveDelayMax : auto_move_delay_max;
 
         // Ensure colors are initialized
         if (!bestMoveColors || bestMoveColors.length === 0) {

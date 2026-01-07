@@ -34,7 +34,10 @@ const dbValues = {
   bestMoveColors: 'bestMoveColors',
   bullet_mode: 'bullet_mode',
   bullet_depth: 'bullet_depth',
-  bullet_movetime: 'bullet_movetime'
+  bullet_movetime: 'bullet_movetime',
+  auto_move_enabled: 'auto_move_enabled',
+  auto_move_delay_min: 'auto_move_delay_min',
+  auto_move_delay_max: 'auto_move_delay_max'
 };
 
 // Default values
@@ -60,7 +63,10 @@ const defaults = {
   bestMoveColors: [],
   bullet_mode: false,
   bullet_depth: 4,
-  bullet_movetime: 100
+  bullet_movetime: 100,
+  auto_move_enabled: false,
+  auto_move_delay_min: 500,
+  auto_move_delay_max: 2000
 };
 
 // Current settings state
@@ -174,6 +180,12 @@ function updateReloadEngineDisplay() {
 function updateBulletSettingsDisplay() {
   const bulletSettings = document.getElementById('bullet-settings');
   bulletSettings.style.display = settings.bullet_mode ? 'block' : 'none';
+}
+
+// Update auto-move settings display
+function updateAutoMoveSettingsDisplay() {
+  const autoMoveSettings = document.getElementById('auto-move-settings');
+  autoMoveSettings.style.display = settings.auto_move_enabled ? 'block' : 'none';
 }
 
 // Update WebSocket version configuration based on engine type
@@ -389,6 +401,9 @@ async function applySettingsToUI() {
   document.getElementById('bullet-mode').checked = settings.bullet_mode;
   document.getElementById('bullet-depth').value = settings.bullet_depth;
   document.getElementById('bullet-movetime').value = settings.bullet_movetime;
+  document.getElementById('auto-move-enabled').checked = settings.auto_move_enabled;
+  document.getElementById('auto-move-delay-min').value = settings.auto_move_delay_min;
+  document.getElementById('auto-move-delay-max').value = settings.auto_move_delay_max;
   document.getElementById('display-moves-on-site').checked = settings.displayMovesOnSite;
   document.getElementById('show-opposite-moves').checked = settings.show_opposite_moves;
   document.getElementById('enable-user-log').checked = settings.enableUserLog;
@@ -400,6 +415,7 @@ async function applySettingsToUI() {
   updateEngineSelectionDisplay();
   updateReloadEngineDisplay();
   updateBulletSettingsDisplay();
+  updateAutoMoveSettingsDisplay();
   await updateBestMoveColors();
 }
 
@@ -575,6 +591,23 @@ function initEventListeners() {
   document.getElementById('bullet-movetime').addEventListener('change', async (e) => {
     const value = parseInt(e.target.value);
     await saveSetting('bullet_movetime', value);
+  });
+  
+  // Auto-move settings
+  document.getElementById('auto-move-enabled').addEventListener('change', async (e) => {
+    settings.auto_move_enabled = e.target.checked;
+    await saveSetting('auto_move_enabled', e.target.checked);
+    updateAutoMoveSettingsDisplay();
+  });
+  
+  document.getElementById('auto-move-delay-min').addEventListener('change', async (e) => {
+    const value = parseInt(e.target.value);
+    await saveSetting('auto_move_delay_min', value);
+  });
+  
+  document.getElementById('auto-move-delay-max').addEventListener('change', async (e) => {
+    const value = parseInt(e.target.value);
+    await saveSetting('auto_move_delay_max', value);
   });
   
   // Visual settings
